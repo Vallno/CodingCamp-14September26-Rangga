@@ -1,0 +1,556 @@
+/* ============================================================
+   Expense & Budget Visualizer — style.css
+   Requirements: 2.2, 7.3, 7.4, 7.5
+   ============================================================ */
+
+/* ── Reset & Base ────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Palette — all text/bg combos tested for WCAG 2.1 AA (4.5:1) */
+  --color-bg:           #f5f6fa;     /* page background */
+  --color-surface:      #ffffff;     /* card / section surface */
+  --color-border:       #dde1ea;     /* subtle borders */
+  --color-shadow:       rgba(0, 0, 0, 0.07);
+
+  /* Text — #1e2a3b on #ffffff → 13.5:1 ✔ */
+  --color-text:         #1e2a3b;
+  /* Secondary text — #5a6478 on #ffffff → 5.1:1 ✔ */
+  --color-text-muted:   #5a6478;
+
+  /* Accent — #1a6ed8 on #ffffff → 4.9:1 ✔ */
+  --color-accent:       #1a6ed8;
+  --color-accent-hover: #1558b0;
+
+  /* Danger — #c0392b on #ffffff → 5.6:1 ✔ */
+  --color-danger:       #c0392b;
+  --color-danger-hover: #a02f23;
+  --color-danger-bg:    #fdf3f2;
+  --color-danger-border:#f5c6c2;
+
+  /* Warning banner */
+  --color-warning-bg:   #fffbea;
+  --color-warning-border:#f0d060;
+  --color-warning-text: #7a5800; /* #7a5800 on #fffbea → 7.2:1 ✔ */
+
+  /* Success/balance */
+  --color-balance-bg:   #eaf3ff;
+  --color-balance-border:#b3d0f5;
+
+  /* Spacing scale */
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  32px;
+
+  /* Typography — Requirement 7.4: min 14px body text */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                 Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', Arial, sans-serif;
+  --font-size-base: 15px;   /* ≥ 14px ✔ */
+  --font-size-sm:   13px;
+  --font-size-lg:   18px;
+  --font-size-xl:   22px;
+  --font-size-xxl:  28px;
+  --line-height:    1.55;
+
+  /* Layout */
+  --radius:          8px;
+  --radius-sm:       4px;
+  --card-shadow:     0 2px 8px var(--color-shadow);
+  --tx-list-height:  360px;  /* max-height before scroll kicks in — Req 2.2 */
+  --chart-height:    360px;
+}
+
+html {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height);
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);   /* Requirement 7.4 */
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  min-height: 100vh;
+  padding: var(--space-lg) var(--space-md);
+}
+
+/* ── Page wrapper ────────────────────────────────────────── */
+.app-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ── Page header ─────────────────────────────────────────── */
+.app-header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.app-header h1 {
+  font-size: var(--font-size-xxl);
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.3px;
+}
+
+.app-header p {
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+  margin-top: var(--space-xs);
+}
+
+/* ── Storage warning banner ──────────────────────────────── */
+/* Hidden by default; JS removes this class when needed */
+#storage-warning {
+  display: none;                     /* hidden by default */
+  align-items: flex-start;
+  gap: var(--space-sm);
+  background-color: var(--color-warning-bg);
+  border: 1px solid var(--color-warning-border);
+  border-radius: var(--radius);
+  color: var(--color-warning-text);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+#storage-warning.visible {
+  display: flex;
+}
+
+/* ── Balance Display ─────────────────────────────────────── */
+/* Non-overlapping bounding area — Requirement 7.3 */
+.balance-section {
+  background-color: var(--color-balance-bg);
+  border: 1px solid var(--color-balance-border);
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+  padding: var(--space-lg) var(--space-xl);
+  margin-bottom: var(--space-lg);
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.balance-section .balance-label {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+#balance-value {
+  font-size: var(--font-size-xxl);
+  font-weight: 700;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Overflow indicator — hidden by default, shown via JS */
+#balance-overflow {
+  display: none;                     /* hidden by default */
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-danger);
+  background-color: var(--color-danger-bg);
+  border: 1px solid var(--color-danger-border);
+  border-radius: 999px;
+  padding: 2px var(--space-sm);
+  white-space: nowrap;
+}
+
+#balance-overflow.visible {
+  display: inline-block;
+}
+
+/* ── Main content — two-column on wide screens ───────────── */
+/* Requirement 7.3: non-overlapping bounding areas */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr;        /* single-column default */
+  gap: var(--space-lg);
+}
+
+@media (min-width: 768px) {
+  .main-grid {
+    /* Form + List on left | Chart on right */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .left-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+}
+
+/* ── Shared card styling ─────────────────────────────────── */
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+  padding: var(--space-lg);
+}
+
+.card-title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* ── Transaction Input Form ──────────────────────────────── */
+/* Non-overlapping bounding area — Requirement 7.3 */
+.form-section {
+  /* extends .card */
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.form-group:last-of-type {
+  margin-bottom: var(--space-lg);
+}
+
+.form-group label {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.form-group input,
+.form-group select {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);   /* Requirement 7.4 */
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+  width: 100%;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.form-group select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a6478' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(26, 110, 216, 0.15);
+}
+
+.form-group input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.7;
+}
+
+/* Inline error spans — hidden by default — Requirement from design */
+.error-msg,
+#err-item-name,
+#err-amount,
+#err-category {
+  display: none;                     /* hidden by default */
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-danger);
+  margin-top: 2px;
+}
+
+/* JS adds aria-invalid / .has-error to show the span */
+.form-group.has-error input,
+.form-group.has-error select {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.12);
+}
+
+/* When JS makes them visible */
+#err-item-name.visible,
+#err-amount.visible,
+#err-category.visible {
+  display: block;
+}
+
+/* Submit button */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);   /* Requirement 7.4 */
+  font-weight: 600;
+  color: #ffffff;                     /* white on #1a6ed8 → 4.9:1 ✔ */
+  background-color: var(--color-accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-xl);
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-accent-hover);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+.btn-primary:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ── Transaction List ────────────────────────────────────── */
+/* Non-overlapping bounding area — Requirement 7.3 */
+.list-section {
+  /* extends .card */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scrollable list container — Requirement 2.2 */
+#tx-list {
+  list-style: none;
+  max-height: var(--tx-list-height);
+  overflow-y: auto;                  /* scrollable — Requirement 2.2 */
+  overscroll-behavior: contain;
+  padding-right: var(--space-xs);    /* room for scrollbar */
+}
+
+/* Custom scrollbar (Chromium/WebKit) */
+#tx-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+#tx-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#tx-list::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 999px;
+}
+
+/* Empty state message inside the list */
+.tx-empty-msg {
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--space-xl) var(--space-md);
+}
+
+/* Individual transaction entries */
+.tx-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-sm);
+  border-radius: var(--radius-sm);
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color 0.1s ease;
+}
+
+.tx-item:last-child {
+  border-bottom: none;
+}
+
+.tx-item:hover {
+  background-color: var(--color-bg);
+}
+
+.tx-item-body {
+  flex: 1;
+  min-width: 0;  /* allow text truncation */
+}
+
+.tx-item-name {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tx-item-meta {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.tx-item-amount {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Delete button */
+.btn-delete {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-danger);
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 2px var(--space-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-delete:hover {
+  background-color: var(--color-danger-bg);
+  border-color: var(--color-danger-border);
+}
+
+.btn-delete:focus-visible {
+  outline: 3px solid var(--color-danger);
+  outline-offset: 2px;
+}
+
+/* Delete error banner (shown in list area on persist failure) */
+.delete-error-banner {
+  display: none;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-danger);
+  background-color: var(--color-danger-bg);
+  border: 1px solid var(--color-danger-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-xs) var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.delete-error-banner.visible {
+  display: block;
+}
+
+/* ── Pie Chart Section ───────────────────────────────────── */
+/* Non-overlapping bounding area — Requirement 7.3 */
+.chart-section {
+  /* extends .card */
+}
+
+#chart-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--chart-height);
+  max-height: var(--chart-height);
+}
+
+#spending-chart {
+  max-height: calc(var(--chart-height) - var(--space-lg));
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* Empty state for chart — hidden by default, shown when no data */
+#chart-empty-msg {
+  display: none;                     /* hidden by default */
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--space-xl) var(--space-md);
+}
+
+#chart-empty-msg.visible {
+  display: block;
+}
+
+/* Category badge used inside chart legend / list items */
+.category-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+.category-badge--food {
+  background-color: #e8f5e9;
+  color: #2e7d32; /* on #e8f5e9 → 5.3:1 ✔ */
+}
+
+.category-badge--transport {
+  background-color: #e3f2fd;
+  color: #1565c0; /* on #e3f2fd → 5.5:1 ✔ */
+}
+
+.category-badge--fun {
+  background-color: #fce4ec;
+  color: #880e4f; /* on #fce4ec → 7.4:1 ✔ */
+}
+
+/* ── Responsive adjustments ──────────────────────────────── */
+@media (max-width: 767px) {
+  :root {
+    --tx-list-height: 280px;
+    --chart-height:   300px;
+  }
+
+  .balance-section {
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-md);
+  }
+
+  #balance-value {
+    font-size: var(--font-size-xl);
+  }
+
+  .app-header h1 {
+    font-size: var(--font-size-xl);
+  }
+}
+
+/* ── Utility: visually hidden (accessible hide) ──────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
